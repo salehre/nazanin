@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>❤</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #0d0810;
+        overflow: hidden;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Press Start 2P", monospace;
+      }
+      canvas {
+        position: fixed;
+        inset: 0;
+        display: block;
+      }
+
+      /* scanline */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          to bottom,
+          transparent 0px,
+          transparent 3px,
+          rgba(0, 0, 0, 0.07) 3px,
+          rgba(0, 0, 0, 0.07) 4px
+        );
+        pointer-events: none;
+        z-index: 50;
+      }
+
+      .ui {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.9rem;
+        pointer-events: none;
+        z-index: 20;
+      }
+
+      /* dinkie pixel heart */
+      .px-heart {
+        image-rendering: pixelated;
+        opacity: 0;
+        animation: pixPop 0.5s steps(4) forwards;
+        animation-delay: 0.6s;
+      }
+      @keyframes pixPop {
+        0% {
+          opacity: 0;
+          transform: scale(0.3);
+        }
+        60% {
+          opacity: 1;
+          transform: scale(1.2);
+        }
+        80% {
+          transform: scale(0.93);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .love-txt {
+        font-size: clamp(0.55rem, 2.2vw, 0.82rem);
+        color: #fff;
+        text-shadow:
+          2px 2px 0 #7a0020,
+          0 0 18px rgba(220, 60, 80, 0.9),
+          0 0 55px rgba(220, 60, 80, 0.4);
+        letter-spacing: 0.06em;
+        line-height: 2;
+        text-align: center;
+        opacity: 0;
+        animation: fadeUp 0.45s steps(5) forwards;
+        animation-delay: 1.3s;
+      }
+      .sub-txt {
+        font-size: clamp(0.3rem, 1.1vw, 0.42rem);
+        color: rgba(255, 170, 170, 0.6);
+        letter-spacing: 0.1em;
+        opacity: 0;
+        animation: fadeUp 0.4s steps(4) forwards;
+        animation-delay: 1.9s;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .back-link {
+        position: fixed;
+        bottom: 1.6rem;
+        left: 1.6rem;
+        z-index: 60;
+        pointer-events: all;
+        font-family: "Press Start 2P", monospace;
+        font-size: 0.3rem;
+        background: rgba(20, 10, 28, 0.85);
+        color: rgba(255, 255, 255, 0.22);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        padding: 0.45rem 1rem;
+        text-decoration: none;
+        letter-spacing: 0.08em;
+        opacity: 0;
+        animation: fadeUp 0.4s steps(4) forwards;
+        animation-delay: 2.8s;
+        box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+      }
+      .back-link:hover {
+        color: rgba(255, 255, 255, 0.5);
+        border-color: rgba(255, 255, 255, 0.25);
+      }
+
+      /* ── love timer, bottom-right ── */
+
+      .love-timer{
+  position:fixed;bottom:1.6rem;right:1.6rem;
+  z-index:60;
+  font-family:'Press Start 2P',monospace;
+  background:rgba(20,10,28,.85);
+  border:2px solid rgba(255,90,120,.25);
+  box-shadow:2px 2px 0 rgba(0,0,0,.5);
+  padding:.8rem 1.1rem;
+  text-align:right;
+  opacity:0;
+  animation:fadeUp .4s steps(4) forwards;
+  animation-delay:2.8s;
+  cursor:pointer;
+  user-select:none;
+}
+.love-timer:hover{ border-color:rgba(255,90,120,.5); }
+.love-timer .label{
+  font-size:.4rem;
+  letter-spacing:.08em;
+  color:rgba(255,170,170,.45);
+  margin-bottom:.55rem;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.4rem;
+}
+
+.love-timer .row{
+  display:flex;
+  gap:.7rem;
+  justify-content:flex-end;
+}
+.love-timer .unit{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-width:2.2rem;
+}
+.love-timer .val{
+  font-size:.7rem;
+  color:#ff5577;
+  text-shadow:0 0 8px rgba(255,70,100,.7);
+}
+.love-timer .uname{
+  font-size:.3rem;
+  color:rgba(255,170,170,.4);
+  margin-top:.35rem;
+  letter-spacing:.04em;
+}
+
+      /* single-value display mode (hours-only / mins-only / secs-only) */
+/* single-value display mode (hours-only / mins-only / secs-only) */
+.love-timer .single{
+  display:none;
+  align-items:baseline;
+  justify-content:flex-end;
+  gap:.55rem;
+}
+.love-timer .single .val{ font-size:1.2rem; }
+.love-timer .single .uname{ font-size:.36rem; margin-top:0; }
+.love-timer.mode-hours .row,
+.love-timer.mode-mins  .row,
+.love-timer.mode-secs  .row{ display:none; }
+.love-timer.mode-hours .single[data-u="hours"],
+.love-timer.mode-mins  .single[data-u="mins"],
+.love-timer.mode-secs  .single[data-u="secs"]{ display:flex; }
+      /* ── dropdown menu ── */
+/* ── dropdown menu ── */
+.timer-menu{
+  position:absolute;
+  bottom:calc(100% + .6rem);
+  right:0;
+  background:rgba(20,10,28,.96);
+  border:2px solid rgba(255,90,120,.3);
+  box-shadow:3px 3px 0 rgba(0,0,0,.5);
+  min-width:10rem;
+  opacity:0;
+  transform:translateY(6px);
+  pointer-events:none;
+  transition:opacity .18s, transform .18s;
+  z-index:70;
+}
+.love-timer.open .timer-menu{
+  opacity:1;
+  transform:translateY(0);
+  pointer-events:all;
+}
+.timer-menu button{
+  display:block;
+  width:100%;
+  text-align:left;
+  font-family:'Press Start 2P',monospace;
+  font-size:.4rem;
+  letter-spacing:.06em;
+  background:transparent;
+  border:none;
+  color:rgba(255,200,210,.55);
+  padding:.65rem .85rem;
+  cursor:pointer;
+  transition:background .15s,color .15s;
+}
+.timer-menu button:hover{
+  background:rgba(255,90,120,.15);
+  color:#ff8aa3;
+}
+.timer-menu button.active{
+  color:#ff5577;
+}
+.timer-menu button.active::before{
+  content:'▸ ';
+}
+
+@media (max-width:480px){
+  .love-timer{ right:.7rem; bottom:.7rem; padding:.6rem .75rem; }
+  .back-link{ left:.7rem; bottom:.7rem; font-size:.26rem; padding:.4rem .8rem; }
+  .love-timer .row{ gap:.45rem; }
+  .love-timer .unit{ min-width:1.7rem; }
+  .love-timer .val{ font-size:.55rem; }
+  .love-timer .single .val{ font-size:.9rem; }
+  .timer-menu{ min-width:8.5rem; }
+  .timer-menu button{ font-size:.34rem; padding:.55rem .7rem; }
+}
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <div class="ui">
+      <!-- dinkie pixel heart -->
+      <svg
+        class="px-heart"
+        width="88"
+        height="80"
+        viewBox="0 0 11 10"
+        xmlns="http://www.w3.org/2000/svg"
+        shape-rendering="crispEdges"
+      >
+        <rect x="1" y="0" width="3" height="1" fill="#ff4466" />
+        <rect x="7" y="0" width="3" height="1" fill="#ff4466" />
+        <rect x="0" y="1" width="4" height="1" fill="#ff4466" />
+        <rect x="7" y="1" width="4" height="1" fill="#ff4466" />
+        <rect x="0" y="2" width="11" height="1" fill="#ff3355" />
+        <rect x="0" y="3" width="11" height="1" fill="#ff3355" />
+        <rect x="1" y="4" width="9" height="1" fill="#e62244" />
+        <rect x="1" y="5" width="9" height="1" fill="#e62244" />
+        <rect x="2" y="6" width="7" height="1" fill="#cc1133" />
+        <rect x="3" y="7" width="5" height="1" fill="#cc1133" />
+        <rect x="4" y="8" width="3" height="1" fill="#aa0022" />
+        <rect x="5" y="9" width="1" height="1" fill="#880011" />
+        <rect x="2" y="2" width="2" height="1" fill="rgba(255,255,255,.35)" />
+        <rect x="2" y="3" width="1" height="1" fill="rgba(255,255,255,.2)" />
+      </svg>
+
+      <div class="love-txt">i love you</div>
+      <div class="sub-txt">you are my baby misstres for ever</div>
+    </div>
+
+    <a href="index.html" class="back-link">← go back</a>
+
+<!--    <div class="love-timer" id="loveTimer">-->
+<!--      <div class="timer-menu" id="timerMenu">-->
+<!--        <button type="button" class="active" data-mode="full">-->
+<!--          days / hrs / min / sec-->
+<!--        </button>-->
+<!--        <button type="button" data-mode="hours">total hours</button>-->
+<!--        <button type="button" data-mode="mins">total minutes</button>-->
+<!--        <button type="button" data-mode="secs">total seconds</button>-->
+<!--      </div>-->
+
+<!--      <div class="label">-->
+<!--        <span>together since oct 26, 2024</span>-->
+<!--      </div>-->
+
+<!--      <div class="row">-->
+<!--        <div class="unit">-->
+<!--          <span class="val" id="t-days">0</span><span class="uname">days</span>-->
+<!--        </div>-->
+<!--        <div class="unit">-->
+<!--          <span class="val" id="t-hours">0</span><span class="uname">hrs</span>-->
+<!--        </div>-->
+<!--        <div class="unit">-->
+<!--          <span class="val" id="t-mins">0</span><span class="uname">min</span>-->
+<!--        </div>-->
+<!--        <div class="unit">-->
+<!--          <span class="val" id="t-secs">0</span><span class="uname">sec</span>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      <div class="single" data-u="hours">-->
+<!--        <span class="val" id="s-hours">0</span-->
+<!--        ><span class="uname">total hrs</span>-->
+<!--      </div>-->
+<!--      <div class="single" data-u="mins">-->
+<!--        <span class="val" id="s-mins">0</span-->
+<!--        ><span class="uname">total min</span>-->
+<!--      </div>-->
+<!--      <div class="single" data-u="secs">-->
+<!--        <span class="val" id="s-secs">0</span-->
+<!--        ><span class="uname">total sec</span>-->
+<!--      </div>-->
+<!--    </div>-->
+
+    <script>
+      (function () {
+        const canvas = document.getElementById("c");
+        const ctx = canvas.getContext("2d");
+        let W,
+          H,
+          frame = 0,
+          cells = [];
+
+        /* ── resize ── */
+        function resize() {
+          W = canvas.width = innerWidth;
+          H = canvas.height = innerHeight;
+        }
+        resize();
+        window.addEventListener("resize", () => {
+          resize();
+          build();
+        });
+
+        /* ── classic parametric heart boundary, pre-baked as a polygon ── */
+        const HEART_POLY = (() => {
+          const poly = [];
+          const STEPS = 200;
+          for (let i = 0; i <= STEPS; i++) {
+            const t = (i / STEPS) * Math.PI * 2;
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y =
+              13 * Math.cos(t) -
+              5 * Math.cos(2 * t) -
+              2 * Math.cos(3 * t) -
+              Math.cos(4 * t);
+            poly.push([x, y]);
+          }
+          return poly;
+        })();
+        /* known bounding box of the curve above, used to normalise scale */
+        const HEART_BOUNDS = { xMin: -16, xMax: 16, yMin: -17, yMax: 11.93 };
+
+        function inHeartPoly(px, py) {
+          const poly = HEART_POLY;
+          let inside = false;
+          for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+            const xi = poly[i][0],
+              yi = poly[i][1];
+            const xj = poly[j][0],
+              yj = poly[j][1];
+            if (
+              yi > py !== yj > py &&
+              px < ((xj - xi) * (py - yi)) / (yj - yi + 1e-12) + xi
+            ) {
+              inside = !inside;
+            }
+          }
+          return inside;
+        }
+
+        /* ── rasterise heart onto a grid, collect filled cells ── */
+        function build() {
+          cells = [];
+          /* grid cell size in px — smaller = denser text */
+          const CELL = Math.max(9, Math.round(Math.min(W, H) / 58));
+
+          /* fit heart curve (in its own ~32x29 unit space) into ~78% of shorter screen dim */
+          const heartW = HEART_BOUNDS.xMax - HEART_BOUNDS.xMin;
+          const heartH = HEART_BOUNDS.yMax - HEART_BOUNDS.yMin;
+          const target = Math.min(W, H) * 0.8;
+          const scale = target / Math.max(heartW, heartH);
+
+          const cx = W / 2;
+          const cy =
+            H / 2 + scale * 1.4; /* nudge down slightly to optically center */
+
+          const cols = Math.ceil(W / CELL);
+          const rows = Math.ceil(H / CELL);
+
+          for (let r = 0; r < rows; r++) {
+            for (let co = 0; co < cols; co++) {
+              const px = co * CELL + CELL / 2;
+              const py = r * CELL + CELL / 2;
+              /* map screen px back into heart-curve coordinate space */
+              const hx = (px - cx) / scale;
+              const hy = -(py - cy) / scale;
+              if (inHeartPoly(hx, hy)) {
+                cells.push({ tx: px, ty: py, cell: CELL });
+              }
+            }
+          }
+          /* shuffle so they fly in from random directions nicely */
+          for (let i = cells.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cells[i], cells[j]] = [cells[j], cells[i]];
+          }
+
+          makeParticles();
+        }
+
+        /* ── word pool ── */
+        const WORDS = [
+          "i love you",
+          "love you",
+          "my princess",
+          "my queen",
+          "my girl",
+          "❤",
+          "you",
+        ];
+        const REDS = [
+          "#ff2244",
+          "#ff4466",
+          "#cc0033",
+          "#ff6688",
+          "#dd1144",
+          "#ff3355",
+          "#ff557a",
+        ];
+
+        /* ── particles ── */
+        let parts = [];
+
+        function makeParticles() {
+          /* measure each word so we can pack them tightly per cell */
+          const BASE_SZ = Math.max(6, Math.round(Math.min(W, H) / 105));
+
+          parts = cells.map((c, i) => {
+            const word = WORDS[i % WORDS.length];
+            const color = REDS[i % REDS.length];
+            const sz = BASE_SZ + ((Math.random() * 2) | 0); // tiny size variation
+            const delay = Math.floor(i * 1.4); // staggered arrival
+            /* start position: scattered around center */
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.min(W, H) * 0.55;
+            return {
+              tx: c.tx,
+              ty: c.ty,
+              x: W / 2 + Math.cos(angle) * dist,
+              y: H / 2 + Math.sin(angle) * dist,
+              word,
+              color,
+              sz,
+              delay,
+              alpha: 0,
+              phase: Math.random() * Math.PI * 2,
+              glow: 18 + Math.random() * 22,
+            };
+          });
+        }
+
+        build();
+
+        /* ── ambient sparks ── */
+        const sparks = Array.from({ length: 18 }, () => ({
+          x: Math.random() * 1000,
+          y: Math.random() * 1000,
+          vx: (Math.random() - 0.5) * 0.25,
+          vy: -(Math.random() * 0.25 + 0.08),
+          r: Math.random() * 1.5 + 0.8,
+          a: Math.random() * 0.25,
+          c: REDS[Math.floor(Math.random() * REDS.length)],
+        }));
+
+        /* ── render loop ── */
+        function loop() {
+          /* dark trail */
+          ctx.fillStyle = "rgba(13,8,16,0.22)";
+          ctx.fillRect(0, 0, W, H);
+
+          /* sparks */
+          sparks.forEach((s) => {
+            s.x += s.vx;
+            s.y += s.vy;
+            if (s.y < -5) {
+              s.y = H + 5;
+              s.x = Math.random() * W;
+            }
+            ctx.save();
+            ctx.globalAlpha = s.a * 0.5;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fillStyle = s.c;
+            ctx.shadowColor = s.c;
+            ctx.shadowBlur = 8;
+            ctx.fill();
+            ctx.restore();
+          });
+
+          /* heart text particles */
+          parts.forEach((p) => {
+            if (frame < p.delay) return;
+
+            /* lerp toward target */
+            p.x += (p.tx - p.x) * 0.06;
+            p.y += (p.ty - p.y) * 0.06;
+            p.alpha = Math.min(p.alpha + 0.02, 1);
+
+            const atTarget =
+              Math.abs(p.x - p.tx) < 1 && Math.abs(p.y - p.ty) < 1;
+            const pulse = atTarget
+              ? 0.07 * Math.sin(frame * 0.03 + p.phase)
+              : 0;
+
+            ctx.save();
+            ctx.globalAlpha = Math.min(1, p.alpha + pulse);
+            ctx.font = `${p.sz}px 'Press Start 2P',monospace`;
+            ctx.fillStyle = p.color;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur =
+              p.glow * (0.5 + 0.5 * Math.sin(frame * 0.035 + p.phase));
+            ctx.fillText(p.word, p.x - ctx.measureText(p.word).width / 2, p.y);
+            ctx.restore();
+          });
+
+          frame++;
+          requestAnimationFrame(loop);
+        }
+        loop();
+
+        /* ── live "together since" timer ── */
+        (function () {
+          const START = new Date(2024, 9, 26, 23, 0, 0); // months are 0-indexed: 9 = October
+
+          const dEl = document.getElementById("t-days");
+          const hEl = document.getElementById("t-hours");
+          const mEl = document.getElementById("t-mins");
+          const sEl = document.getElementById("t-secs");
+
+          const totalHEl = document.getElementById("s-hours");
+          const totalMEl = document.getElementById("s-mins");
+          const totalSEl = document.getElementById("s-secs");
+
+          function pad(n) {
+            return String(n).padStart(2, "0");
+          }
+
+          function tick() {
+            const now = new Date();
+            let diffSec = Math.floor((now - START) / 1000);
+            if (diffSec < 0) diffSec = 0;
+
+            /* breakdown view */
+            const days = Math.floor(diffSec / 86400);
+            let rem = diffSec - days * 86400;
+            const hours = Math.floor(rem / 3600);
+            rem -= hours * 3600;
+            const mins = Math.floor(rem / 60);
+            const secs = rem - mins * 60;
+
+            dEl.textContent = days;
+            hEl.textContent = pad(hours);
+            mEl.textContent = pad(mins);
+            sEl.textContent = pad(secs);
+
+            /* running totals view */
+            totalHEl.textContent = Math.floor(diffSec / 3600).toLocaleString(
+              "en-US",
+            );
+            totalMEl.textContent = Math.floor(diffSec / 60).toLocaleString(
+              "en-US",
+            );
+            totalSEl.textContent = diffSec.toLocaleString("en-US");
+          }
+
+          tick();
+          setInterval(tick, 1000);
+
+          /* ── dropdown menu interaction ── */
+          const timerEl = document.getElementById("loveTimer");
+          const menuEl = document.getElementById("timerMenu");
+          const buttons = menuEl.querySelectorAll("button");
+
+          function setMode(mode) {
+            timerEl.classList.remove("mode-hours", "mode-mins", "mode-secs");
+            if (mode !== "full") timerEl.classList.add("mode-" + mode);
+            buttons.forEach((b) =>
+              b.classList.toggle("active", b.dataset.mode === mode),
+            );
+          }
+
+          timerEl.addEventListener("click", function (e) {
+            /* clicking a menu button selects a mode but doesn't toggle the menu itself */
+            if (e.target.closest("#timerMenu button")) return;
+            timerEl.classList.toggle("open");
+          });
+
+          buttons.forEach((btn) => {
+            btn.addEventListener("click", function (e) {
+              e.stopPropagation();
+              setMode(btn.dataset.mode);
+              timerEl.classList.remove("open");
+            });
+          });
+
+          document.addEventListener("click", function (e) {
+            if (!timerEl.contains(e.target)) timerEl.classList.remove("open");
+          });
+        })();
+      })();
+    </script>
+  </body>
+</html>

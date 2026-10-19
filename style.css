@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:            #1a1020;
+  --bg2:           #221428;
+  --surface:       #2a1a32;
+  --surface2:      #341f3e;
+  --border:        rgba(255,255,255,0.13);
+  --accent:        #d94060;
+  --accent-bright: #ff5577;
+  --accent-dim:    #8a2040;
+  --pink:          #e8799a;
+  --rose:          #ffc0cb;
+  --text:          #f5e6f0;
+  --text2:         #b090a8;
+  --text3:         #6a4a60;
+  --pixel: 'Press Start 2P', monospace;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--pixel);
+  overflow: hidden;
+  image-rendering: pixelated;
+}
+
+/* ── scanline overlay ── */
+.scanline {
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* ── pixel grid bg ── */
+.pixel-bg {
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── stars (pixel squares not circles) ── */
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 0;    /* pixel squares */
+  animation: twinkle var(--d,3s) ease-in-out infinite;
+  animation-delay: var(--delay,0s);
+  opacity: 0;
+}
+@keyframes twinkle {
+  0%,100% { opacity: 0; }
+  50%     { opacity: var(--op,0.5); }
+}
+
+/* ── layout ── */
+.container {
+  position: relative; z-index: 1;
+  height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+}
+
+/* ── card ── */
+.card {
+  background: var(--surface);
+  /* pixel/chunky border via box-shadow */
+  box-shadow:
+    0 0 0 3px var(--accent-dim),
+    0 0 0 6px var(--surface),
+    0 0 0 9px rgba(217,64,96,0.25),
+    8px 8px 0 0 rgba(0,0,0,0.4);
+  border-radius: 0;
+  padding: 2.5rem 2.2rem 2rem;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  animation: fadeSlideUp 0.5s steps(8) both;
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── pixel heart icon ── */
+.pixel-icon {
+  color: var(--accent);
+  margin-bottom: 1.6rem;
+  display: flex; justify-content: center;
+  animation: heartPulse 1.8s steps(2) infinite;
+}
+.pixel-icon svg { width: 44px; height: 44px; }
+@keyframes heartPulse {
+  0%,100% { transform: scale(1); color: var(--accent); }
+  50%     { transform: scale(1.12); color: var(--accent-bright); }
+}
+
+/* ── typography ── */
+.question {
+  font-size: clamp(0.6rem, 2.2vw, 0.85rem);
+  line-height: 2;
+  color: var(--text);
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.02em;
+}
+.subtext {
+  font-size: 0.48rem;
+  color: var(--text2);
+  margin-bottom: 2.2rem;
+  line-height: 2;
+  letter-spacing: 0.05em;
+}
+
+/* ── buttons container ── */
+.buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ── pixel button base ── */
+.pixel-btn {
+  font-family: var(--pixel);
+  cursor: pointer;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  letter-spacing: 0.04em;
+  image-rendering: pixelated;
+  transition: transform 0.08s steps(2), background 0.1s;
+  /* chunky pixel shadow */
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+}
+
+/* ── YES button ── */
+.btn-yes {
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.6rem;
+  padding: 0.7rem 1.4rem;
+  transition: font-size 0.3s cubic-bezier(0.34,1.56,0.64,1),
+              padding 0.3s cubic-bezier(0.34,1.56,0.64,1),
+              background 0.15s;
+  min-width: 90px;
+}
+.btn-yes:hover  { background: var(--accent-bright); transform: translate(-1px,-1px); box-shadow: 4px 4px 0 rgba(0,0,0,0.5); }
+.btn-yes:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.5); }
+
+/* size steps for yes button growth */
+.btn-yes[data-hits="1"] { font-size: 0.68rem; padding: 0.76rem 1.5rem; }
+.btn-yes[data-hits="2"] { font-size: 0.78rem; padding: 0.82rem 1.65rem; }
+.btn-yes[data-hits="3"] { font-size: 0.9rem;  padding: 0.9rem 1.85rem; }
+.btn-yes[data-hits="4"] { font-size: 1.05rem; padding: 1rem 2.1rem; }
+.btn-yes[data-hits="5"] { font-size: 1.2rem;  padding: 1.1rem 2.3rem; background: var(--accent-bright); }
+.btn-yes[data-hits="6"] { font-size: 1.4rem;  padding: 1.2rem 2.5rem; background: var(--accent-bright); }
+.btn-yes[data-hits="7"],
+.btn-yes[data-hits="8"],
+.btn-yes[data-hits="9"] { font-size: 1.6rem;  padding: 1.3rem 2.8rem; background: #ff3360; box-shadow: 5px 5px 0 rgba(0,0,0,0.6); }
+
+/* ── NO button ── */
+.btn-no {
+  background: var(--surface2);
+  color: var(--text3);
+  font-size: 0.52rem;
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--text3);
+  /* smooth float transition */
+
+}
+
+
+
+/* ── back button ── */
+.btn-back {
+  display: inline-block;
+  text-decoration: none;
+  background: var(--surface2);
+  color: var(--text3);
+  font-family: var(--pixel);
+  font-size: 0.38rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--text3);
+  border-radius: 0;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+  transition: color 0.15s, border-color 0.15s;
+  letter-spacing: 0.06em;
+}
+.btn-back:hover { color: var(--text2); border-color: var(--text2); }
+
+/* ── responsive ── */
+@media (max-width: 480px) {
+  .card { padding: 1.8rem 1.2rem 1.5rem; }
+  .buttons { flex-direction: column; align-items: center; gap: 0.7rem; }
+  .btn-no.floating {
+    position: static !important;
+    left: unset !important; top: unset !important;
+  }
+}
